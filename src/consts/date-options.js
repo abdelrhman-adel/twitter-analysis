@@ -1,5 +1,7 @@
-import moment from 'moment/moment';
+import moment from 'moment';
 
+
+// options of the date pickers with its handler to pick the starting date dynamically
 export const dateOptions = [
   {
     title: 'last week',

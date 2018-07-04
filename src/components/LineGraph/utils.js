@@ -1,14 +1,25 @@
-import moment from 'moment/moment';
+import moment from 'moment';
+import {
+  formatDate,
+  limitDecimals,
+  parseFloatIfNecessary,
+} from '../../modules/helpers';
 
+
+/**
+ * configures chart based on the data it got from the API request
+ * @param data
+ * @return {Object}
+ */
 export const options = data => ({
   title: {
     text: 'Interactions Per Follower',
   },
   xAxis: {
-    categories: data.map(el => moment(el.date).format('ddd, MMM D YYYY')),
+    categories: data.map(el => formatDate('ddd, MMM D YYYY')(moment(el.date))),
     labels: {
       formatter: function() {
-        return moment(this.value).format('MMM D');
+        return formatDate('MMM D')(moment(this.value));
       },
     },
   },
@@ -27,7 +38,6 @@ export const options = data => ({
     shared: true,
     useHTML: true,
     headerFormat: '<small>{point.key}</small><table>',
-    footerFormat: '</table>',
     pointFormatter: function() {
       const {
         index,
@@ -35,28 +45,33 @@ export const options = data => ({
       } = this;
       const diff =
         index !== 0 &&
-        Math.round(
-          (data[index].data.interactions_per_follower -
-            data[index - 1].data.interactions_per_follower) *
-            1000,
-        ) / 1000;
+        limitDecimals(3)(
+          data[index].data.interactions_per_follower -
+            data[index - 1].data.interactions_per_follower
+        );
       return `<tr>
                 <td style="color: ${color}">${name} </td>
-                <td style="text-align: center"><b>${Math.round(
-                  data[index].data.interactions_per_follower * 1000,
-                ) / 1000}%</b></td>
-                ${diff ?
-                  `<td  style="text-align: right;color:${
-                    diff > 0 ? 'green' : 'red'
-                  }"><small>${diff > 0 ? '+' : ''}${diff}</small></td>` :''}
+                <td style="text-align: center"><b>${limitDecimals(3)(
+                  data[index].data.interactions_per_follower,
+                )}%</b></td>
+                ${
+                  diff
+                    ? `<td  style="text-align: right;color:${
+                        diff > 0 ? 'green' : 'red'
+                      }"><small>${diff > 0 ? '+' : ''}${diff}</small></td>`
+                    : ''
+                }
               </tr>`;
     },
+    footerFormat: '</table>',
     valueDecimals: 3,
   },
   series: [
     {
       name: 'Interactions per Follower',
-      data: data.map(el => el.data.interactions_per_follower),
+      data: data.map(el =>
+        parseFloatIfNecessary(el.data.interactions_per_follower),
+      ),
       color: '#35BDA8',
       type: 'area',
       fillColor: {

@@ -1,14 +1,24 @@
-import moment from 'moment/moment';
+import moment from 'moment';
+import {
+  formatDate,
+  parseFloatIfNecessary,
+} from '../../modules/helpers';
+
+/**
+ * configures chart based on the data it got from the API request
+ * @param data
+ * @return {Object}
+ */
 
 export const options = data => ({
   title: {
     text: 'Retweets, Mentions & Favorites',
   },
   xAxis: {
-    categories: data.map(el => moment(el.date).format('ddd, MMM D YYYY')),
+    categories: data.map(el => formatDate('ddd, MMM D YYYY')(moment(el.date))),
     labels: {
       formatter: function() {
-        return moment(this.value).format('MMM D');
+        return formatDate('MMM D')(moment(this.value));
       },
     },
   },
@@ -27,7 +37,6 @@ export const options = data => ({
     shared: true,
     useHTML: true,
     headerFormat: '<small>{point.key}</small><table>',
-    footerFormat: '</table>',
     pointFormatter: function() {
       const {
         index,
@@ -37,9 +46,9 @@ export const options = data => ({
         index !== 0 && data[index].data[name] - data[index - 1].data[name];
       return `<tr>
                 <td style="color: ${color}">${name} </td>
-                <td style="text-align: center"><b>${Math.round(
-                  data[index].data[name] * 1000,
-                ) / 1000}</b></td>
+                <td style="text-align: center"><b>${
+                  data[index].data[name]
+                }</b></td>
                 ${
                   diff
                     ? `<td  style="text-align: right;color:${
@@ -49,38 +58,14 @@ export const options = data => ({
                 }
               </tr>`;
     },
+    footerFormat: '</table>',
     valueDecimals: 3,
   },
   series: [
-    {
-      name: 'retweets',
-      data: data.map(
-        el =>
-          Number.isInteger(el.data.retweets)
-            ? el.data.retweets
-            : parseFloat(el.data.retweets),
-      ),
+    ...['retweets', 'favorites', 'mentions'].map(key => ({
+      name: key,
+      data: data.map(el => parseFloatIfNecessary(el.data[key])),
       type: 'column',
-    },
-    {
-      name: 'favorites',
-      data: data.map(
-        el =>
-          Number.isInteger(el.data.favorites)
-            ? el.data.favorites
-            : parseFloat(el.data.favorites),
-      ),
-      type: 'column',
-    },
-    {
-      name: 'mentions',
-      data: data.map(
-        el =>
-          Number.isInteger(el.data.mentions)
-            ? el.data.mentions
-            : parseFloat(el.data.mentions),
-      ),
-      type: 'column',
-    },
+    })),
   ],
 });

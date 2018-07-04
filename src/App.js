@@ -1,11 +1,15 @@
 import React, { Component } from 'react';
 import moment from 'moment';
+
 import './App.css';
+
 import { charts } from './modules/api';
 import { formatDate } from './modules/helpers';
+
 import LineGraph from './components/LineGraph/LineGraph';
 import BarChart from './components/BarChart/BarChart';
 import Block from './components/Block/Block';
+
 import { dateOptions } from './consts/date-options';
 
 class App extends Component {
@@ -24,6 +28,7 @@ class App extends Component {
       barChartData: [],
     };
 
+    // bind methods to this
     this.updateChartsData = this.updateChartsData.bind(this);
     this.inputChanged = this.inputChanged.bind(this);
     this.dateChanged = this.dateChanged.bind(this);
@@ -32,8 +37,12 @@ class App extends Component {
     this.updateChartsData();
   }
 
+  /**
+   * update the charts data
+   */
   updateChartsData() {
     const { startDate, endDate, ids } = this.state;
+    const formatAPIDate = formatDate('YYYY-MM-DD');
     this.setState(
       {
         lineGraphLoading: true,
@@ -41,9 +50,10 @@ class App extends Component {
         barChartLoading: true,
         barChartError: false,
       },
+      // run charts requests after initializing state
       charts({
-        startDate: formatDate(startDate),
-        endDate: formatDate(endDate),
+        startDate: formatAPIDate(startDate),
+        endDate: formatAPIDate(endDate),
         ids,
       })([
         {
@@ -67,6 +77,7 @@ class App extends Component {
   inputChanged({ target: { value } }) {
     this.setState({ ids: value });
   }
+
   dateChanged({ target: { value } }) {
     this.setState(
       {
@@ -76,6 +87,7 @@ class App extends Component {
       this.updateChartsData,
     );
   }
+
   render() {
     const {
       ids,
