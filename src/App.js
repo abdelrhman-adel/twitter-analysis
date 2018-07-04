@@ -6,19 +6,22 @@ import './App.css';
 import { charts } from './modules/api';
 import { formatDate } from './modules/helpers';
 import LineGraph from './components/LineGraph/LineGraph';
+import BarChart from './components/BarChart/BarChart';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       startDate: moment()
-        .subtract(1, 'months')
+        .subtract(10, 'years')
         .add(1, 'days'),
       endDate: moment(),
       ids: 'thecounter',
       isLoading: false,
+      lineGraphError: false,
       lineGraphData: [],
-      BarChartData: [],
+      barChartError: false,
+      barChartData: [],
     };
   }
   componentWillMount() {
@@ -35,15 +38,17 @@ class App extends Component {
       {
         metrics: ['interactions_per_follower'],
         cb: lineGraphData => this.setState({ lineGraphData }),
+        cbErr: () => this.setState({ lineGraphError: true }),
       },
       {
         metrics: ['retweets', 'favorites', 'mentions'],
-        cb: BarChartData => this.setState({ BarChartData }),
+        cb: barChartData => this.setState({ barChartData }),
+        cbErr: () => this.setState({ barChartError: true }),
       },
     ]);
   }
   render() {
-    const { lineGraphData } = this.state;
+    const { lineGraphData, barChartData } = this.state;
     return (
       <div className="App">
         <header className="App-header">
@@ -51,6 +56,7 @@ class App extends Component {
           <h1 className="App-title">Welcome to React</h1>
         </header>
         <LineGraph data={lineGraphData} />
+        <BarChart data={barChartData} />
       </div>
     );
   }

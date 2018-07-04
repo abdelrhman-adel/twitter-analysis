@@ -14,7 +14,9 @@ export const chartRequest = ({ startDate, endDate, ids, metrics }) =>
   }).then(res => res.data.data);
 
 export const charts = ({ startDate, endDate, ids }) => chartOptions => {
-  chartOptions.forEach(({ metrics, cb }) =>
-    chartRequest({ startDate, endDate, ids, metrics }).then(data => cb(data)),
+  chartOptions.forEach(({ metrics, cb, cbErr }) =>
+    chartRequest({ startDate, endDate, ids, metrics })
+      .then(cb)
+      .catch(cbErr),
   );
 };

@@ -5,7 +5,12 @@ export const options = data => ({
     text: 'Interactions Per Follower',
   },
   xAxis: {
-    categories: data.map(el => moment(el.date).format('MMM D')),
+    categories: data.map(el => moment(el.date).format('ddd, MMM D YYYY')),
+    labels: {
+      formatter: function() {
+        return moment(this.value).format('MMM D');
+      },
+    },
   },
   yAxis: {
     gridLineWidth: 1,
@@ -18,12 +23,40 @@ export const options = data => ({
       },
     },
   },
+  tooltip: {
+    shared: true,
+    useHTML: true,
+    headerFormat: '<small>{point.key}</small><table>',
+    footerFormat: '</table>',
+    pointFormatter: function() {
+      const {
+        index,
+        series: { color, name },
+      } = this;
+      const diff =
+        index !== 0 &&
+        Math.round(
+          (data[index].data.interactions_per_follower -
+            data[index - 1].data.interactions_per_follower) *
+            1000,
+        ) / 1000;
+      return `<tr>
+                <td style="color: ${color}">${name} </td>
+                <td style="text-align: center"><b>${Math.round(
+                  data[index].data.interactions_per_follower * 1000,
+                ) / 1000}%</b></td>
+                ${diff &&
+                  `<td  style="text-align: right;color:${
+                    diff > 0 ? 'green' : 'red'
+                  }"><small>${diff > 0 ? '+' : ''}${diff}</small></td>`}
+              </tr>`;
+    },
+    valueDecimals: 3,
+  },
   series: [
     {
       name: 'Interactions per Follower',
-      data: data.map(
-        el => Math.round(el.data.interactions_per_follower * 1000) / 1000,
-      ),
+      data: data.map(el => el.data.interactions_per_follower),
       color: '#35BDA8',
       type: 'area',
       fillColor: {
