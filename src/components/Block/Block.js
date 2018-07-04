@@ -44,6 +44,6 @@ Block.propTypes = {
   title: PropTypes.string.isRequired,
   isLoading: PropTypes.bool.isRequired,
   hasError: PropTypes.bool.isRequired,
-  errorHandler: PropTypes.function.isRequired,
+  errorHandler: PropTypes.func.isRequired,
 };
 export default Block;
