@@ -1,7 +1,7 @@
 import axios from 'axios';
 import EP from '../consts/api';
 
-export const charts = ({ startDate, endDate, ids, metrics }) =>
+export const chartRequest = ({ startDate, endDate, ids, metrics }) =>
   axios({
     method: 'get',
     url: EP.get,
@@ -11,4 +11,10 @@ export const charts = ({ startDate, endDate, ids, metrics }) =>
       ids,
       metrics: metrics.join(','),
     },
-  });
+  }).then(res => res.data.data);
+
+export const charts = ({ startDate, endDate, ids }) => chartOptions => {
+  chartOptions.forEach(({ metrics, cb }) =>
+    chartRequest({ startDate, endDate, ids, metrics }).then(data => cb(data)),
+  );
+};
