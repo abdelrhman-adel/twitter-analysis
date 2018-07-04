@@ -45,10 +45,10 @@ export const options = data => ({
                 <td style="text-align: center"><b>${Math.round(
                   data[index].data.interactions_per_follower * 1000,
                 ) / 1000}%</b></td>
-                ${diff &&
+                ${diff ?
                   `<td  style="text-align: right;color:${
                     diff > 0 ? 'green' : 'red'
-                  }"><small>${diff > 0 ? '+' : ''}${diff}</small></td>`}
+                  }"><small>${diff > 0 ? '+' : ''}${diff}</small></td>` :''}
               </tr>`;
     },
     valueDecimals: 3,

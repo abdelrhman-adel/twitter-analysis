@@ -33,7 +33,6 @@ export const options = data => ({
         index,
         series: { color, name },
       } = this;
-      console.log(this);
       const diff =
         index !== 0 && data[index].data[name] - data[index - 1].data[name];
       return `<tr>
